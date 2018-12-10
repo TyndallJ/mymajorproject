@@ -1,8 +1,9 @@
 # Major Project Proposal
-A top down shooter. Similar to the arcade game Journey of the Prairie King in Stardew Valley
+A grid based top down shooter. Similar to the arcade game Journey of the Prairie King in Stardew Valley
 
 
 ## Needs to Have
+- Grid based 
 - Character with gun
 - bullets that kill enemies
 - Character movement
@@ -11,7 +12,6 @@ A top down shooter. Similar to the arcade game Journey of the Prairie King in St
 - End Screen
 - Character health 
 - levels 
-- boss levels
 - collision detection
 - 
 
@@ -21,4 +21,5 @@ A top down shooter. Similar to the arcade game Journey of the Prairie King in St
 ## Nice to have
 - Powerups
 - money system with a forever powerup
+- boss levels
 
