@@ -18,37 +18,39 @@ class Cowboy {
     this.isLeft = false;
   }
   handleKeyPress() {
-      if (key === "w" || "W") {
-        this.isUp = true;
-      }
-      if (key === "s" || "S") {
-        this.isDown = true;
-      }
-      if (key === "a" || "A") {
-        this.isLeft = true;
-      }
-      if (key === "d" || "D") {
-        this.isRight = true;
-      }
-
-      if (key === " ") {
-//BULLETARRAY
-      }
+    if (key === "w" || "W") {
+      this.isUp = true;
+    }
+    if (key === "s" || "S") {
+      this.isDown = true;
+    }
+    if (key === "a" || "A") {
+      this.isLeft = true;
+    }
+    if (key === "d" || "D") {
+      this.isRight = true;
     }
 
-    handleKeyRelease() {
-      if (key === "w" || "W") {
-        this.isUp = false;
-      }
-      if (key === "s" || "S") {
-        this.isDown = false;
-      }
-      if (key === "a" || "A") {
-        this.isLeft = false;
-      }
-      if (key === "d" || "D") {
-        this.isRight = false;
-      }
+    if (key === " ") {
+      //BULLETARRAY
+    }
+  }
+
+  handleKeyRelease() {
+    if (key === "w" || "W") {
+      this.isUp = false;
+    }
+    if (key === "s" || "S") {
+      this.isDown = false;
+    }
+    if (key === "a" || "A") {
+      this.isLeft = false;
+    }
+    if (key === "d" || "D") {
+      this.isRight = false;
+    }
+  }
+}
 
 
 function setup() {
