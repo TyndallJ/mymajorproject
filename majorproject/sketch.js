@@ -10,8 +10,8 @@ class Cowboy {
     this.downimageToDisplay = downImage;
     this.leftimageToDisplay = leftImage;
     this.rightimageToDisplay = rightImage;
-    this.dx = 5;
-    this.dy = 5;
+    this.dx = 4;
+    this.dy = 4;
     this.w = this.idleimageToDisplay.width;
     this.h = this.idleimageToDisplay.height;
     this.isRight = false;
@@ -178,7 +178,7 @@ function keyReleased() {
 function drawMap() {
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
-      // Converting level Characters to images
+
       if (map1[j][i] === 1) {
         image(wallImg, i * cellSize, j * cellSize, cellSize, cellSize);
       }
