@@ -1,6 +1,18 @@
 // Tyndall Johnston
 // Journey of the Prarie King Remake
 //
+class Enemy {
+  constructor(){
+
+  }
+  update(){
+
+  }
+  display(){
+
+  }
+}
+
 class Cowboy {
   constructor(x, y, idleImage, upImage, downImage, leftImage, rightImage) {
     this.x = x;
@@ -18,6 +30,10 @@ class Cowboy {
     this.isLeft = false;
     this.isUp = false;
     this.isDown = false;
+    this.shootRight = false;
+    this.shootLeft = false;
+    this.shootUp = false;
+    this.shootDown = false;
   }
 
   handleKeyPress() {
@@ -32,6 +48,18 @@ class Cowboy {
     }
     if (key === "d" || key === "D") {
       this.isRight = true;
+    }
+    if (key === "UP_ARROW") {
+      this.shootUp = true;
+    }
+    if (key === "DOWN_ARROW") {
+      this.shootDown = true;
+    }
+    if (key === "RIGHT_ARROW") {
+      this.shootRight = true;
+    }
+    if (key === "LEFT_ARROW") {
+      this.shootLeft = true;
     }
   }
 
@@ -48,6 +76,18 @@ class Cowboy {
     if (key === "d" || key === "D") {
       this.isRight = false;
     }
+    // if (key === "UP_ARROW") {
+    //   this.shootUp = false;
+    // }
+    // if (key === "DOWN_ARROW") {
+    //   this.shootDown = false;
+    // }
+    // if (key === "RIGHT_ARROW") {
+    //   this.shootRight = false;
+    // }
+    // if (key === "LEFT_ARROW") {
+    //   this.shootLeft = false;
+    // }
   }
   update() {
     //move
@@ -97,6 +137,7 @@ class Cowboy {
     if (this.isDown) {
       image(this.downimageToDisplay, this.x, this.y);
     }
+    //Add arrow key gun point.
   }
 }
 
