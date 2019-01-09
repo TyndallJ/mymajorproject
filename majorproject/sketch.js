@@ -2,14 +2,19 @@
 // Journey of the Prarie King Remake
 //
 class Enemy {
-  constructor(){
+  constructor(x, y, enemyImage){
+    this.x = x;
+    this.y = y;
+    this.imageToDisplay = enemyImage;
+
 
   }
   update(){
 
   }
   display(){
-
+    //sprite - cowboy x and y
+    // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
   }
 }
 
@@ -49,18 +54,18 @@ class Cowboy {
     if (key === "d" || key === "D") {
       this.isRight = true;
     }
-    if (key === "UP_ARROW") {
-      this.shootUp = true;
-    }
-    if (key === "DOWN_ARROW") {
-      this.shootDown = true;
-    }
-    if (key === "RIGHT_ARROW") {
-      this.shootRight = true;
-    }
-    if (key === "LEFT_ARROW") {
-      this.shootLeft = true;
-    }
+  //   if (key === "UP_ARROW") {
+  //     this.shootUp = true;
+  //   }
+  //   if (key === "DOWN_ARROW") {
+  //     this.shootDown = true;
+  //   }
+  //   if (key === "RIGHT_ARROW") {
+  //     this.shootRight = true;
+  //   }
+  //   if (key === "LEFT_ARROW") {
+  //     this.shootLeft = true;
+  //   }
   }
 
   handleKeyRelease() {
