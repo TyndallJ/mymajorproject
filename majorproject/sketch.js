@@ -1,22 +1,6 @@
 // Tyndall Johnston
 // Journey of the Prarie King Remake
 //
-class Enemy {
-  constructor(x, y, enemyImage){
-    this.x = x;
-    this.y = y;
-    this.imageToDisplay = enemyImage;
-
-
-  }
-  update(){
-
-  }
-  display(){
-    //sprite - cowboy x and y
-    // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
-  }
-}
 
 class Cowboy {
   constructor(x, y, idleImage, upImage, downImage, leftImage, rightImage) {
@@ -145,6 +129,32 @@ class Cowboy {
     //Add arrow key gun point.
   }
 }
+class Enemy {
+  constructor(x, y, enemyImage){
+    this.x = x;
+    this.y = y;
+    this.imageToDisplay = enemyImage;
+    this.dx = 5;
+    this.dy = 5;
+    this.imageToDisplay.width;
+    this.imageToDisplay.height;
+
+
+  }
+  update(){
+    this.x = cowboyChar.x;
+    this.y = cowboyChar.y;
+
+
+
+  }
+  display(){
+    // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
+    imageMode(CENTER);
+    image(this.imageToDisplay, this.x + 10, this.y + 10);
+  }
+}
+
 
 let map1 = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -181,8 +191,10 @@ let wallImg, midgrndImg, etrgrndImg, otrgrndImg;
 
 //Character Images and Variables
 let cowboyChar;
+let enemyChar;
 let bulletImg;
 let idleImg, upImg, downImg, leftImg, rightImg;
+let enemyImg;
 
 function preload() {
   wallImg = loadImage("assets/mapborder.png");
@@ -197,11 +209,14 @@ function preload() {
   rightImg = loadImage("assets/heroright.png");
 
   bulletImg = loadImage("assets/bullet.png");
+
+  enemyImg = loadImage("assets/enemy.png");
 }
 
 function setup() {
   createCanvas(600, 600);
   cowboyChar = new Cowboy(width / 2, height / 1.8, idleImg, upImg, downImg, leftImg, rightImg, bulletImg);
+  enemyChar = new Enemy(width / 2, height / 1.8, enemyImg);
   cellSize = 24;
 }
 
@@ -211,6 +226,8 @@ function draw() {
   drawMap();
   cowboyChar.update();
   cowboyChar.display();
+  enemyChar.update();
+  enemyChar.display();
 }
 
 function keyPressed() {
