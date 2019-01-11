@@ -133,17 +133,28 @@ class Enemy {
   constructor(x, y, enemyImage){
     this.x = x;
     this.y = y;
+    this.follow = 0.01;
     this.imageToDisplay = enemyImage;
-    this.dx = 5;
-    this.dy = 5;
     this.imageToDisplay.width;
     this.imageToDisplay.height;
 
 
   }
+  spawnin(){
+    this.x = 25;
+    this.y = 300;
+  }
+
+
   update(){
-    this.x = cowboyChar.x;
-    this.y = cowboyChar.y;
+    let targetX = cowboyChar.x;
+    let dx = targetX - this.x;
+    this.x += dx * this.follow;
+
+
+    let targetY = cowboyChar.y;
+    let dy = targetY - this.y;
+    this.y += dy * this.follow;
 
 
 
@@ -151,7 +162,7 @@ class Enemy {
   display(){
     // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
     imageMode(CENTER);
-    image(this.imageToDisplay, this.x + 10, this.y + 10);
+    image(this.imageToDisplay, this.x, this.y);
   }
 }
 
@@ -196,6 +207,7 @@ let bulletImg;
 let idleImg, upImg, downImg, leftImg, rightImg;
 let enemyImg;
 
+
 function preload() {
   wallImg = loadImage("assets/mapborder.png");
   midgrndImg = loadImage("assets/middleground.png");
@@ -218,6 +230,7 @@ function setup() {
   cowboyChar = new Cowboy(width / 2, height / 1.8, idleImg, upImg, downImg, leftImg, rightImg, bulletImg);
   enemyChar = new Enemy(width / 2, height / 1.8, enemyImg);
   cellSize = 24;
+  enemyChar.spawnin();
 }
 
 function draw() {
@@ -226,8 +239,16 @@ function draw() {
   drawMap();
   cowboyChar.update();
   cowboyChar.display();
+
   enemyChar.update();
   enemyChar.display();
+  checkCoords();
+}
+
+function checkCoords(){
+  if (cowboyChar.x === enemyChar.x && cowboyChar.y === enemyChar.y) {
+    background(155);
+  }
 }
 
 function keyPressed() {
