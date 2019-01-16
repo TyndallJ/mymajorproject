@@ -108,9 +108,10 @@ class Cowboy {
   }
 
   display() {
-    // rectMode(CENTER);
-    // fill(255);
-    // rect(this.x, this.y, this.w, this.h);
+    rectMode(CENTER);
+    noStroke();
+    fill(255,255,255);
+    rect(this.x, this.y, this.w, this.h);
     imageMode(CENTER);
     image(this.idleimageToDisplay, this.x, this.y);
 
@@ -135,8 +136,8 @@ class Enemy {
     this.y = y;
     this.follow = 0.01;
     this.imageToDisplay = enemyImage;
-    this.imageToDisplay.width;
-    this.imageToDisplay.height;
+    this.w = this.imageToDisplay.width;
+    this.h = this.imageToDisplay.height;
 
 
   }
@@ -161,6 +162,10 @@ class Enemy {
   }
   display(){
     // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
+    rectMode(CENTER);
+    noStroke();
+    fill(255,255,255);
+    rect(this.x, this.y, this.w, this.h);
     imageMode(CENTER);
     image(this.imageToDisplay, this.x, this.y);
   }
@@ -206,6 +211,12 @@ let enemyChar;
 let bulletImg;
 let idleImg, upImg, downImg, leftImg, rightImg;
 let enemyImg;
+let hoverPlay = false; // 2D Collide function that defaults the play button as false
+let hoverControls = false; // 2D Collide function that defaults the Control button as false
+let hoverBackControl = false; // 2D Collide function that defaults the BackControl button as false
+let fillStart, fillControl;
+let state;
+let mainMenuScreen, controlScreen;
 
 
 function preload() {
@@ -223,9 +234,12 @@ function preload() {
   bulletImg = loadImage("assets/bullet.png");
 
   enemyImg = loadImage("assets/enemy.png");
+  mainMenuScreen = loadImage("assets/mainmenu.png");
+  controlScreen = loadImage("assets/controls.png");
 }
 
 function setup() {
+  state = "MainMenu";
   createCanvas(600, 600);
   cowboyChar = new Cowboy(width / 2, height / 1.8, idleImg, upImg, downImg, leftImg, rightImg, bulletImg);
   enemyChar = new Enemy(width / 2, height / 1.8, enemyImg);
@@ -234,15 +248,107 @@ function setup() {
 }
 
 function draw() {
-  background(40,80,60);
-  imageMode(CORNER);
-  drawMap();
-  cowboyChar.update();
-  cowboyChar.display();
+  if(state === "gameStart"){
+    imageMode(CORNER);
+    drawMap();
+    cowboyChar.update();
+    cowboyChar.display();
+    enemyChar.update();
+    enemyChar.display();
+    checkCoords();
+  }
+  else if (state === "controlSettings") {
+    image(controlScreen, 0, 0, 600, 600);
+  }
+  else{
+    state = "MainMenu";
+    image(mainMenuScreen, 0, 0, 600, 600);
+  }
+mainMenu();
+//  Mouse to Rectangle collision detection
+hoverPlay = collidePointRect(mouseX, mouseY, 200, 400, 600/2 - 100, 400/6);
+hoverControls = collidePointRect(mouseX, mouseY, 200, 500, 600/2 - 100, 200/4);
+hoverBackControl = collidePointRect(mouseX, mouseY, 20, 450, 75, 50);
+}
 
-  enemyChar.update();
-  enemyChar.display();
-  checkCoords();
+function mainMenu() {
+  if (state === "MainMenu") {
+    push(); // Creating rectangles that are linked to 2d Collide functions
+    let fillStart = controlStart();
+    fill(fillStart);
+    rect(200, 400, 600/2 - 100, 400/6);
+    //image(playimg, 400 + 215, 220 + 40, 1600/6, 790/7 ); // Image Files that displays what button does
+    pop();
+
+    push(); // Creating rectangles that are linked to 2d Collide functions
+    let fillControl = controlFill();
+    fill(fillControl);
+    rect(200, 500, 600/2 - 100, 200/4);
+    //image(controlimg, 575 + 60.5, 500.3334 + 20, 350/1.5, 175/3); // Image Files that displays what button does
+    pop();
+  }
+  else if (state === "controlSettings") {
+    push(); // Creating rectangles that are linked to 2d Collide functions
+    let fillBack = backFill();
+    fill(fillBack);
+    rect(20, 450, 75, 50);
+    //image(backimg, 100 + 30.5, 665 + 15, 115, 35); // Image Files that displays what button does
+    pop();
+  }
+}
+
+function controlStart() {
+  if (state === "MainMenu"){
+    if(hoverPlay){ // This means if mouse x and y are in the certian cordinates then it will return triggering the if staement
+      fillStart = color(255);
+    }
+    else{
+      fillStart = color(255, 100, 100);
+    }
+    return fillStart;
+  }
+}
+
+function backFill() {
+  let fillBack;
+  if (state === "controlSettings"){
+    if(hoverBackControl){ // This means if mouse x and y are in the certian cordinates then it will return triggering the if staement
+      fillBack = color(255);
+    }
+    else{
+      fillBack = color(255, 100, 100);
+    }
+    return fillBack;
+  }
+}
+
+function controlFill() {
+  // let fillControl;
+  if (state === "MainMenu"){
+    if(hoverControls){ // This means if mouse x and y are in the certian cordinates then it will return triggering the if staement
+      fillControl = color(255);
+    }
+    else{
+      fillControl = color(255, 100, 100);
+    }
+    return fillControl;
+  }
+}
+
+function mousePressed() {
+  if (state === "MainMenu"){
+    if (hoverPlay) {
+      state = "gameStart";
+    }
+    else if (hoverControls) {
+      state = "controlSettings";
+    }
+  }
+  else if (state === "controlSettings") {
+    if (hoverBackControl){
+      state = "MainMenu";
+    }
+  }
 }
 
 function checkCoords(){
