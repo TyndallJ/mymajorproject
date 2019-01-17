@@ -2,6 +2,37 @@
 // Journey of the Prarie King Remake
 //
 
+class Bullet {
+  constructor(x, y, dx, dy, theImage) {
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.size = 5;
+    this.offScreen = false;
+    this.imageToDisplay = theImage;
+    this.w = this.imageToDisplay.width;
+    this.h = this.imageToDisplay.height;
+  }
+
+  update() {
+    this.x += this.dx;
+    this.y += this.dy;
+    if (this.x >= width + this.size || this.x <= 0 - this.size || this.y >= height + this.size || this.y <= 0 - this.size) {
+      this.offScreen = true;
+    }
+  }
+
+  display() {
+    fill(0);
+    rect(this.x, this.y, this.size, this.size);
+    imageMode(CENTER);
+    image(this.imageToDisplay, this.x, this.y);
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class Cowboy {
   constructor(x, y, idleImage, upImage, downImage, leftImage, rightImage) {
     this.x = x;
@@ -13,8 +44,10 @@ class Cowboy {
     this.rightimageToDisplay = rightImage;
     this.dx = 4;
     this.dy = 4;
+    this.bulletArray = [];
     this.w = this.idleimageToDisplay.width;
     this.h = this.idleimageToDisplay.height;
+    this.idle = true;
     this.isRight = false;
     this.isLeft = false;
     this.isUp = false;
@@ -27,56 +60,79 @@ class Cowboy {
 
   handleKeyPress() {
     if (key === "w" || key === "W") {
+      this.idle = false;
       this.isUp = true;
     }
     if (key === "s" || key === "S") {
+      this.idle = false;
       this.isDown = true;
     }
     if (key === "a" || key === "A") {
+      this.idle = false;
       this.isLeft = true;
     }
     if (key === "d" || key === "D") {
+      this.idle = false;
       this.isRight = true;
     }
-  //   if (key === "UP_ARROW") {
-  //     this.shootUp = true;
-  //   }
-  //   if (key === "DOWN_ARROW") {
-  //     this.shootDown = true;
-  //   }
-  //   if (key === "RIGHT_ARROW") {
-  //     this.shootRight = true;
-  //   }
-  //   if (key === "LEFT_ARROW") {
-  //     this.shootLeft = true;
-  //   }
+    if (key === "i" || key === "I") {
+      this.idle = false;
+      this.shootUp = true;
+      someBullet = new Bullet(this.x, this.y, 0, -10, bulletImg);
+      this.bulletArray.push(someBullet);
+    }
+    if (key === "j" || key === "J") {
+      this.idle = false;
+      this.shootLeft = true;
+      someBullet = new Bullet(this.x, this.y, -10, 0, bulletImg);
+      this.bulletArray.push(someBullet);
+    }
+    if (key === "k" || key === "K") {
+      this.idle = false;
+      this.shootRight = true;
+      someBullet = new Bullet(this.x, this.y, 0, 10, bulletImg);
+      this.bulletArray.push(someBullet);
+    }
+    if (key === "l" || key === "L") {
+      this.idle = false;
+      this.shootLeft = true;
+      someBullet = new Bullet(this.x, this.y, 10, 0, bulletImg);
+      this.bulletArray.push(someBullet);
+    }
   }
-
   handleKeyRelease() {
     if (key === "w" || key === "W") {
       this.isUp = false;
+      this.idle = true;
     }
     if (key === "s" || key === "S") {
       this.isDown = false;
+      this.idle = true;
     }
     if (key === "a" || key === "A") {
       this.isLeft = false;
+      this.idle = true;
     }
     if (key === "d" || key === "D") {
       this.isRight = false;
+      this.idle = true;
     }
-    // if (key === "UP_ARROW") {
-    //   this.shootUp = false;
-    // }
-    // if (key === "DOWN_ARROW") {
-    //   this.shootDown = false;
-    // }
-    // if (key === "RIGHT_ARROW") {
-    //   this.shootRight = false;
-    // }
-    // if (key === "LEFT_ARROW") {
-    //   this.shootLeft = false;
-    // }
+    if (key === "i" || key === "I") {
+      this.shootUp = false;
+      this.idle = true;
+    }
+    if (key === "j" || key === "J") {
+      this.shootLeft = false;
+      this.idle = true;
+    }
+    if (key === "k" || key === "K") {
+      this.shootRight = false;
+      this.idle = true;
+    }
+    if (key === "l" || key === "L") {
+      this.shootLeft = false;
+      this.idle = true;
+    }
   }
   update() {
     //move
@@ -104,7 +160,13 @@ class Cowboy {
     if (this.y <= 25){
       this.y += this.dy;
     }
-
+    for (let i = this.bulletArray.length - 1; i >= 0; i--) {
+      this.bulletArray[i].update();
+      this.bulletArray[i].display();
+      if (this.bulletArray[i].offScreen) {
+        this.bulletArray.splice(i, 1);
+      }
+    }
   }
 
   display() {
@@ -113,8 +175,9 @@ class Cowboy {
     fill(255, 255, 255);
     rect(this.x, this.y, this.w, this.h);
     imageMode(CENTER);
-    image(this.idleimageToDisplay, this.x, this.y);
-
+    if (this.idle){
+      image(this.idleimageToDisplay, this.x, this.y);
+    }
     if (this.isRight) {
       image(this.rightimageToDisplay, this.x, this.y);
     }
@@ -127,26 +190,37 @@ class Cowboy {
     if (this.isDown) {
       image(this.downimageToDisplay, this.x, this.y);
     }
-    //Add arrow key gun point.
+    if (this.shootRight) {
+      image(this.rightimageToDisplay, this.x, this.y);
+    }
+    if (this.shootLeft) {
+      image(this.leftimageToDisplay, this.x, this.y);
+    }
+    if (this.shootUp) {
+      image(this.upimageToDisplay, this.x, this.y);
+    }
+    if (this.shootDown) {
+      image(this.downimageToDisplay, this.x, this.y);
+    }
   }
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class Enemy {
   constructor(x, y, enemyImage){
     this.x = x;
     this.y = y;
+
     this.follow = 0.01;
     this.imageToDisplay = enemyImage;
     this.w = this.imageToDisplay.width;
     this.h = this.imageToDisplay.height;
-
-
   }
   spawnin(){
     this.x = 25;
     this.y = 300;
   }
-
-
   update(){
     let targetX = cowboyChar.x;
     let dx = targetX - this.x;
@@ -156,8 +230,6 @@ class Enemy {
     let targetY = cowboyChar.y;
     let dy = targetY - this.y;
     this.y += dy * this.follow;
-
-
 
   }
   display(){
@@ -175,6 +247,7 @@ class Enemy {
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 let map1 = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -203,6 +276,8 @@ let map1 = [
   [1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1],
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
+
+
 //Map Images and Variables
 let cellSize;
 let rows = 25;
@@ -210,6 +285,7 @@ let cols = 25;
 let wallImg, midgrndImg, etrgrndImg, otrgrndImg;
 
 //Character Images and Variables
+let someBullet;
 let cowboyChar;
 let enemyChar;
 let bulletImg;
@@ -259,7 +335,8 @@ function draw() {
     cowboyChar.display();
     enemyChar.update();
     enemyChar.display();
-    checkCoords();
+
+    checkCharEnemHitCoords();
   }
   else if (state === "controlSettings") {
     image(controlScreen, 0, 0, 600, 600);
@@ -269,7 +346,7 @@ function draw() {
     image(mainMenuScreen, 0, 0, 600, 600);
   }
 mainMenu();
-//  Mouse to Rectangle collision detection
+// Mouse to Rectangle collision detection
 hoverPlay = collidePointRect(mouseX, mouseY, 200, 400, 600/2 - 100, 400/6);
 hoverControls = collidePointRect(mouseX, mouseY, 200, 500, 600/2 - 100, 200/4);
 hoverBackControl = collidePointRect(mouseX, mouseY, 20, 450, 75, 50);
@@ -355,11 +432,12 @@ function mousePressed() {
   }
 }
 
-function checkCoords(){
-  let hit = false;
-  hit = collideRectRect(cowboyChar.x, cowboyChar.y, cowboyChar.w, cowboyChar.h, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
-  console.log(hit);
+function checkCharEnemHitCoords(){
+  let charHit = false;
+  charHit = collideRectRect(cowboyChar.x, cowboyChar.y, cowboyChar.w, cowboyChar.h, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
+  console.log(charHit, "character-enemy contact");
 }
+
 
 function keyPressed() {
   cowboyChar.handleKeyPress();
