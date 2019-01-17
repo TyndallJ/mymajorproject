@@ -110,7 +110,7 @@ class Cowboy {
   display() {
     rectMode(CENTER);
     noStroke();
-    fill(255,255,255);
+    fill(255, 255, 255);
     rect(this.x, this.y, this.w, this.h);
     imageMode(CENTER);
     image(this.idleimageToDisplay, this.x, this.y);
@@ -161,6 +161,10 @@ class Enemy {
 
   }
   display(){
+    rectMode(CENTER);
+    noStroke();
+    fill(255, 255, 255);
+    rect(this.x, this.y, this.w, this.h);
     // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
     rectMode(CENTER);
     noStroke();
@@ -352,9 +356,9 @@ function mousePressed() {
 }
 
 function checkCoords(){
-  if (cowboyChar.x === enemyChar.x && cowboyChar.y === enemyChar.y) {
-    background(155);
-  }
+  let hit = false;
+  hit = collideRectRect(cowboyChar.x, cowboyChar.y, cowboyChar.w, cowboyChar.h, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
+  console.log(hit);
 }
 
 function keyPressed() {
