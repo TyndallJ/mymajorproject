@@ -2,26 +2,34 @@
 // Journey of the Prarie King Remake
 //
 
-class Bullet {
+class Shot {
   constructor(x, y, dx, dy, theImage) {
     this.x = x;
     this.y = y;
-    this.dx = dx;
-    this.dy = dy;
-    this.size = 5;
-    this.offScreen = false;
+    this.tempx = dx;
+    this.tempy = dy;
+    this.size = 7;
+    this.checkScreen = false;
+    this.checkShot = false;
     this.imageToDisplay = theImage;
     this.w = this.imageToDisplay.width;
     this.h = this.imageToDisplay.height;
   }
 
   update() {
-    this.x += this.dx;
-    this.y += this.dy;
-    if (this.x >= width + this.size || this.x <= 0 - this.size || this.y >= height + this.size || this.y <= 0 - this.size) {
-      this.offScreen = true;
+    this.x += this.tempx;
+    this.y += this.tempy;
+
+    checkForShot = collideRectRect(this.x, this.y, this.radius, this.radius, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
+    console.log(checkForShot,"bullet-enemy detect");
+    if (this.x >= width + this.size - 125 || this.x <= 0 - this.size || this.y >= height + this.size || this.y <= 0 - this.size) {
+      this.checkScreen = true;
+    }
+    if(checkForShot){
+      this.wasShot = true;
     }
   }
+
 
   display() {
     fill(0);
@@ -78,26 +86,26 @@ class Cowboy {
     if (key === "i" || key === "I") {
       this.idle = false;
       this.shootUp = true;
-      someBullet = new Bullet(this.x, this.y, 0, -10, bulletImg);
-      this.bulletArray.push(someBullet);
+      someShot = new Shot(this.x, this.y, 0, -10, bulletImg);
+      this.bulletArray.push(someShot);
     }
     if (key === "j" || key === "J") {
       this.idle = false;
       this.shootLeft = true;
-      someBullet = new Bullet(this.x, this.y, -10, 0, bulletImg);
-      this.bulletArray.push(someBullet);
+      someShot = new Shot(this.x, this.y, -10, 0, bulletImg);
+      this.bulletArray.push(someShot);
     }
     if (key === "k" || key === "K") {
       this.idle = false;
       this.shootRight = true;
-      someBullet = new Bullet(this.x, this.y, 0, 10, bulletImg);
-      this.bulletArray.push(someBullet);
+      someShot = new Shot(this.x, this.y, 0, 10, bulletImg);
+      this.bulletArray.push(someShot);
     }
     if (key === "l" || key === "L") {
       this.idle = false;
       this.shootLeft = true;
-      someBullet = new Bullet(this.x, this.y, 10, 0, bulletImg);
-      this.bulletArray.push(someBullet);
+      someShot = new Shot(this.x, this.y, 10, 0, bulletImg);
+      this.bulletArray.push(someShot);
     }
   }
   handleKeyRelease() {
@@ -163,7 +171,7 @@ class Cowboy {
     for (let i = this.bulletArray.length - 1; i >= 0; i--) {
       this.bulletArray[i].update();
       this.bulletArray[i].display();
-      if (this.bulletArray[i].offScreen) {
+      if (this.bulletArray[i].checkScreen) {
         this.bulletArray.splice(i, 1);
       }
     }
@@ -211,7 +219,7 @@ class Enemy {
   constructor(x, y, enemyImage){
     this.x = x;
     this.y = y;
-
+    // AI CODE = https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
     this.follow = 0.01;
     this.imageToDisplay = enemyImage;
     this.w = this.imageToDisplay.width;
@@ -285,7 +293,8 @@ let cols = 25;
 let wallImg, midgrndImg, etrgrndImg, otrgrndImg;
 
 //Character Images and Variables
-let someBullet;
+let someShot;
+let checkForShot;
 let cowboyChar;
 let enemyChar;
 let bulletImg;
@@ -321,6 +330,7 @@ function preload() {
 function setup() {
   state = "MainMenu";
   createCanvas(600, 600);
+  background(0);
   cowboyChar = new Cowboy(width / 2, height / 1.8, idleImg, upImg, downImg, leftImg, rightImg, bulletImg);
   enemyChar = new Enemy(width / 2, height / 1.8, enemyImg);
   cellSize = 24;
@@ -329,17 +339,26 @@ function setup() {
 
 function draw() {
   if(state === "gameStart"){
+    createCanvas(700,600);
+    background(0);
     imageMode(CORNER);
     drawMap();
     cowboyChar.update();
     cowboyChar.display();
     enemyChar.update();
     enemyChar.display();
-
     checkCharEnemHitCoords();
   }
   else if (state === "controlSettings") {
     image(controlScreen, 0, 0, 600, 600);
+  }
+  else if(state === "gameOver"){
+    createCanvas(600,600);
+    background(0);
+    textSize(20);
+    textAlign(CENTER,[CENTER]);
+    fill(255);
+    text("you thought you had lives? Nope. Refresh page to start again",300,300);
   }
   else{
     state = "MainMenu";
@@ -436,6 +455,9 @@ function checkCharEnemHitCoords(){
   let charHit = false;
   charHit = collideRectRect(cowboyChar.x, cowboyChar.y, cowboyChar.w, cowboyChar.h, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
   console.log(charHit, "character-enemy contact");
+  if (charHit === true){
+    state = "gameOver";
+  }
 }
 
 
@@ -450,7 +472,6 @@ function keyReleased() {
 function drawMap() {
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
-
       if (map1[j][i] === 1) {
         image(wallImg, i * cellSize, j * cellSize, cellSize, cellSize);
       }
