@@ -6,11 +6,10 @@ class Shot {
   constructor(x, y, dx, dy, theImage) {
     this.x = x;
     this.y = y;
+    this.size = 10;
     this.tempx = dx;
     this.tempy = dy;
-    this.size = 7;
     this.checkScreen = false;
-    this.checkShot = false;
     this.imageToDisplay = theImage;
     this.w = this.imageToDisplay.width;
     this.h = this.imageToDisplay.height;
@@ -19,25 +18,22 @@ class Shot {
   update() {
     this.x += this.tempx;
     this.y += this.tempy;
-
-    checkForShot = collideRectRect(this.x, this.y, this.radius, this.radius, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
-    console.log(checkForShot,"bullet-enemy detect");
-    if (this.x >= width + this.size - 125 || this.x <= 0 - this.size || this.y >= height + this.size || this.y <= 0 - this.size) {
-      this.checkScreen = true;
+    shotHit = collideRectRect(this.x, this.y, this.size, this.size, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
+    if (this.x >= width + this.size || this.x <= 0 - this.size || this.y >= height + this.size || this.y <= 0 - this.size) {
+      this.offScreen = true;
     }
-    if(checkForShot){
-      this.wasShot = true;
+    if(shotHit){
+      this.enemyDetect = true;
     }
   }
 
-
   display() {
-    fill(0);
-    rect(this.x, this.y, this.size, this.size);
+    fill(255,255, 255, 0);
+    rect(this.x, this.y, this.w, this.h);
     imageMode(CENTER);
     image(this.imageToDisplay, this.x, this.y);
   }
-}
+} //The shot class that the Cowboy Fires
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -64,6 +60,7 @@ class Cowboy {
     this.shootLeft = false;
     this.shootUp = false;
     this.shootDown = false;
+    this.isAlive = true;
   }
 
   handleKeyPress() {
@@ -88,6 +85,7 @@ class Cowboy {
       this.shootUp = true;
       someShot = new Shot(this.x, this.y, 0, -10, bulletImg);
       this.bulletArray.push(someShot);
+
     }
     if (key === "j" || key === "J") {
       this.idle = false;
@@ -174,13 +172,25 @@ class Cowboy {
       if (this.bulletArray[i].checkScreen) {
         this.bulletArray.splice(i, 1);
       }
+      if(this.bulletArray[i].enemyDetect){
+        this.bulletArray.splice(i, 1);
+        enemyArray.splice(i,1);
+        enemyChar.x = 300;
+        enemyChar.y = 575;
+        let enemy1 = {
+        };
+        enemyArray.push(enemy1);
+
+        score++;
+      }
     }
+
   }
 
   display() {
     rectMode(CENTER);
     noStroke();
-    fill(255, 255, 255);
+    fill(255,255, 255, 0);
     rect(this.x, this.y, this.w, this.h);
     imageMode(CENTER);
     if (this.idle){
@@ -211,7 +221,7 @@ class Cowboy {
       image(this.downimageToDisplay, this.x, this.y);
     }
   }
-}
+} //The main character that fires Shots at Enemy
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -222,43 +232,38 @@ class Enemy {
     // AI CODE = https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
     this.follow = 0.01;
     this.imageToDisplay = enemyImage;
+    this.checkEnemy = false;
     this.w = this.imageToDisplay.width;
     this.h = this.imageToDisplay.height;
   }
   spawnin(){
-    this.x = 25;
-    this.y = 300;
+    this.x = 300;
+    this.y = 575;
   }
   update(){
     let targetX = cowboyChar.x;
     let dx = targetX - this.x;
     this.x += dx * this.follow;
 
-
     let targetY = cowboyChar.y;
     let dy = targetY - this.y;
     this.y += dy * this.follow;
 
+    // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
   }
   display(){
     rectMode(CENTER);
     noStroke();
-    fill(255, 255, 255);
+    fill(255,255, 255, 0);
     rect(this.x, this.y, this.w, this.h);
-    // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
-    rectMode(CENTER);
-    noStroke();
-    fill(255,255,255);
-    rect(this.x, this.y, this.w, this.h);
-    imageMode(CENTER);
     image(this.imageToDisplay, this.x, this.y);
   }
-}
+} // The Enemy who goes to the Cowboy to kill him
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-let map1 = [
-  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+let map1 = [ // Grid that makes map layout
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   [1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1],
   [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
   [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
@@ -268,11 +273,11 @@ let map1 = [
   [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
   [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
   [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
-  [3, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 3],
-  [3, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 3],
-  [3, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 3],
-  [3, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 3],
-  [3, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 3],
+  [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
+  [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
+  [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
+  [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
+  [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
   [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
   [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
   [1, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1],
@@ -285,47 +290,62 @@ let map1 = [
   [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Map Images and Variables
+//Map Images and their Variables
 let cellSize;
 let rows = 25;
 let cols = 25;
 let wallImg, midgrndImg, etrgrndImg, otrgrndImg;
-
-//Character Images and Variables
-let someShot;
-let checkForShot;
-let cowboyChar;
-let enemyChar;
-let bulletImg;
-let idleImg, upImg, downImg, leftImg, rightImg;
-let enemyImg;
-let hoverPlay = false; // 2D Collide function that defaults the play button as false
-let hoverControls = false; // 2D Collide function that defaults the Control button as false
-let hoverBackControl = false; // 2D Collide function that defaults the BackControl button as false
+let hoverPlay = false;
+let hoverControls = false;
+let hoverBackControl = false;
 let fillStart, fillControl;
 let state;
 let mainMenuScreen, controlScreen;
+let playbutton, controlbutton, backbutton;
 
+//Character and their Variables
+let enemyArray = [];
+let someShot;
+let shotHit;
+let cowboyChar;
+let enemyChar,enemyChar2,enemyChar3,enemyChar4;
+let bulletImg;
+let menuSound;
+let gameSound;
+let idleImg, upImg, downImg, leftImg, rightImg;
+let enemyImg;
+let health = 100;
+let score = 0;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function preload() {
+  //Loading Menu and Button Images
   wallImg = loadImage("assets/mapborder.png");
   midgrndImg = loadImage("assets/middleground.png");
   etrgrndImg = loadImage("assets/enterground.png");
   otrgrndImg = loadImage("assets/outerground.png");
+  mainMenuScreen = loadImage("assets/mainmenu.png");
+  controlScreen = loadImage("assets/controls.png");
+  playbutton = loadImage("assets/playbutton.png");
+  controlbutton = loadImage("assets/controlsbutton.png");
+  backbutton = loadImage("assets/backbutton.png");
 
+  //Loading the Cowboy, Enemy, and Bullet Images/Sounds
   idleImg = loadImage("assets/heroidle.png");
   upImg = loadImage("assets/heroup.png");
   downImg = loadImage("assets/herodown.png");
   leftImg = loadImage("assets/heroleft.png");
   rightImg = loadImage("assets/heroright.png");
-
   bulletImg = loadImage("assets/bullet.png");
-
   enemyImg = loadImage("assets/enemy.png");
-  mainMenuScreen = loadImage("assets/mainmenu.png");
-  controlScreen = loadImage("assets/controls.png");
+  menuSound = loadSound("assets/MenuMusic.mp3");
+  gameSound = loadSound("assets/GameMusic.mp3");
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function setup() {
   state = "MainMenu";
@@ -335,18 +355,40 @@ function setup() {
   enemyChar = new Enemy(width / 2, height / 1.8, enemyImg);
   cellSize = 24;
   enemyChar.spawnin();
+  playSounds();
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function draw() {
+  mainMenu();
+  mainMenuButtons();
+  // Mouse to Rectangle collision detection
+  hoverPlay = collidePointRect(mouseX, mouseY, 200, 400, 600/2 - 100, 400/6);
+  hoverControls = collidePointRect(mouseX, mouseY, 200, 500, 600/2 - 100, 200/4);
+  hoverBackControl = collidePointRect(mouseX, mouseY, 20, 450, 75, 50);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function mainMenu(){
   if(state === "gameStart"){
     createCanvas(700,600);
     background(0);
     imageMode(CORNER);
     drawMap();
+    textSize(20);
+    textAlign(CENTER, [CENTER]);
+    fill(255);
+    text("Health:" + health, 650, 30);
+    text("Score:" + score, 650, 60);
     cowboyChar.update();
     cowboyChar.display();
-    enemyChar.update();
-    enemyChar.display();
+
+    for (let i = 0; i < enemyArray.length; i++) {
+      enemyChar.update();
+      enemyChar.display();
+    }
     checkCharEnemHitCoords();
   }
   else if (state === "controlSettings") {
@@ -364,27 +406,25 @@ function draw() {
     state = "MainMenu";
     image(mainMenuScreen, 0, 0, 600, 600);
   }
-mainMenu();
-// Mouse to Rectangle collision detection
-hoverPlay = collidePointRect(mouseX, mouseY, 200, 400, 600/2 - 100, 400/6);
-hoverControls = collidePointRect(mouseX, mouseY, 200, 500, 600/2 - 100, 200/4);
-hoverBackControl = collidePointRect(mouseX, mouseY, 20, 450, 75, 50);
 }
 
-function mainMenu() {
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function mainMenuButtons() {
   if (state === "MainMenu") {
     push(); // Creating rectangles that are linked to 2d Collide functions
     let fillStart = controlStart();
     fill(fillStart);
     rect(200, 400, 600/2 - 100, 400/6);
-    //image(playimg, 400 + 215, 220 + 40, 1600/6, 790/7 ); // Image Files that displays what button does
+    image(playbutton, 210, 410, 600/2 - 120, 400/6 - 20); // Image Files that displays what button does
     pop();
 
     push(); // Creating rectangles that are linked to 2d Collide functions
     let fillControl = controlFill();
     fill(fillControl);
     rect(200, 500, 600/2 - 100, 200/4);
-    //image(controlimg, 575 + 60.5, 500.3334 + 20, 350/1.5, 175/3); // Image Files that displays what button does
+    imageMode(CORNER);
+    image(controlbutton, 210, 510, 600/2 - 120, 200/4 - 20); // Image Files that displays what button does
     pop();
   }
   else if (state === "controlSettings") {
@@ -392,10 +432,12 @@ function mainMenu() {
     let fillBack = backFill();
     fill(fillBack);
     rect(20, 450, 75, 50);
-    //image(backimg, 100 + 30.5, 665 + 15, 115, 35); // Image Files that displays what button does
+    image(backbutton, 30, 460, 60, 35); // Image Files that displays what button does
     pop();
   }
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function controlStart() {
   if (state === "MainMenu"){
@@ -408,6 +450,14 @@ function controlStart() {
     return fillStart;
   }
 }
+
+function playSounds(){
+  if(state === "MainMenu"){
+    menuSound.play();
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function backFill() {
   let fillBack;
@@ -422,6 +472,8 @@ function backFill() {
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function controlFill() {
   // let fillControl;
   if (state === "MainMenu"){
@@ -435,39 +487,56 @@ function controlFill() {
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function mousePressed() {
   if (state === "MainMenu"){
     if (hoverPlay) {
       state = "gameStart";
     }
-    else if (hoverControls) {
-      state = "controlSettings";
-    }
+  }
+  if (hoverControls) {
+    state = "controlSettings";
   }
   else if (state === "controlSettings") {
     if (hoverBackControl){
       state = "MainMenu";
     }
   }
+  else if (state === "gameStart"){
+    let enemy1 = {
+    };
+    enemyArray.push(enemy1);
+  }
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function checkCharEnemHitCoords(){
   let charHit = false;
   charHit = collideRectRect(cowboyChar.x, cowboyChar.y, cowboyChar.w, cowboyChar.h, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
-  console.log(charHit, "character-enemy contact");
+
   if (charHit === true){
+    health -= 1;
+  }
+  if (health < 0){
     state = "gameOver";
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function keyPressed() {
   cowboyChar.handleKeyPress();
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 function keyReleased() {
   cowboyChar.handleKeyRelease();
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function drawMap() {
   for (let i = 0; i < cols; i++) {
