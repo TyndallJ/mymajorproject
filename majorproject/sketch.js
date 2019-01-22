@@ -1,6 +1,8 @@
 // Tyndall Johnston
 // Journey of the Prarie King Remake
 //
+// Any error is because of the use of 2D Collide
+// Source code for the movement of enemy can be found in "class Enemy - update()"
 
 class Shot {
   constructor(x, y, dx, dy, theImage) {
@@ -15,10 +17,10 @@ class Shot {
     this.h = this.imageToDisplay.height;
   }
 
-  update() {
+  update() { //When its fired it contines to move in the direction it was fired in till it collides
     this.x += this.tempx;
     this.y += this.tempy;
-    shotHit = collideRectRect(this.x, this.y, this.size, this.size, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
+    shotHit = collideRectRect(this.x, this.y, this.size, this.size, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h); //Shot to Enemy collison detection
     if (this.x >= width + this.size || this.x <= 0 - this.size || this.y >= height + this.size || this.y <= 0 - this.size) {
       this.offScreen = true;
     }
@@ -27,7 +29,7 @@ class Shot {
     }
   }
 
-  display() {
+  display() { //Shows the bullet on the map
     fill(255,255, 255, 0);
     rect(this.x, this.y, this.w, this.h);
     imageMode(CENTER);
@@ -37,7 +39,7 @@ class Shot {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Cowboy {
+class Cowboy { //The main character that fires Shots at Enemy
   constructor(x, y, idleImage, upImage, downImage, leftImage, rightImage) {
     this.x = x;
     this.y = y;
@@ -63,7 +65,7 @@ class Cowboy {
     this.isAlive = true;
   }
 
-  handleKeyPress() {
+  handleKeyPress() { //When the key is down it allows the changing of coordinates
     if (key === "w" || key === "W") {
       this.idle = false;
       this.isUp = true;
@@ -106,7 +108,7 @@ class Cowboy {
       this.bulletArray.push(someShot);
     }
   }
-  handleKeyRelease() {
+  handleKeyRelease() { //When the key is up it stops coordinate change
     if (key === "w" || key === "W") {
       this.isUp = false;
       this.idle = true;
@@ -140,7 +142,7 @@ class Cowboy {
       this.idle = true;
     }
   }
-  update() {
+  update() { // Changes the coordinate of Cowboy
     //move
     if (this.isRight) {
       this.x += this.dx;
@@ -166,22 +168,22 @@ class Cowboy {
     if (this.y <= 25){
       this.y += this.dy;
     }
-    for (let i = this.bulletArray.length - 1; i >= 0; i--) {
+    for (let i = this.bulletArray.length - 1; i >= 0; i--) { //Array for when bullet is shot
       this.bulletArray[i].update();
       this.bulletArray[i].display();
-      if (this.bulletArray[i].checkScreen) {
+      if (this.bulletArray[i].checkScreen) { //Removes shot from array when its off the visible screen
         this.bulletArray.splice(i, 1);
       }
-      if(this.bulletArray[i].enemyDetect){
+      if(this.bulletArray[i].enemyDetect){ // Removes the shot from array when its collided with enemy
         this.bulletArray.splice(i, 1);
         enemyArray.splice(i,1);
-        enemyChar.x = 300;
-        enemyChar.y = 575;
+        enemyChar.x = 300; // Resets the enemys coodrinates
+        enemyChar.y = 575; // Resets the enemys coodrinates
         let enemy1 = {
         };
         enemyArray.push(enemy1);
 
-        score++;
+        score++; //Increases the score
       }
     }
 
@@ -221,26 +223,25 @@ class Cowboy {
       image(this.downimageToDisplay, this.x, this.y);
     }
   }
-} //The main character that fires Shots at Enemy
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class Enemy {
+class Enemy { //The enemy that follows the Cowboy
   constructor(x, y, enemyImage){
     this.x = x;
     this.y = y;
-    // AI CODE = https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
     this.follow = 0.01;
     this.imageToDisplay = enemyImage;
     this.checkEnemy = false;
     this.w = this.imageToDisplay.width;
     this.h = this.imageToDisplay.height;
   }
-  spawnin(){
+  spawnin(){ //Sets the starting location
     this.x = 300;
     this.y = 575;
   }
-  update(){
+  update(){ // Tracks the Cowboys coordinates and brings itself towards it
     let targetX = cowboyChar.x;
     let dx = targetX - this.x;
     this.x += dx * this.follow;
@@ -249,16 +250,16 @@ class Enemy {
     let dy = targetY - this.y;
     this.y += dy * this.follow;
 
-    // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
+    //AI CODE FOR THIS UPDATE FUNCTION // https://gamedev.stackexchange.com/questions/50978/moving-a-sprite-towards-an-x-and-y-coordinate
   }
-  display(){
+  display(){//Shows where the enemy is
     rectMode(CENTER);
     noStroke();
     fill(255,255, 255, 0);
     rect(this.x, this.y, this.w, this.h);
     image(this.imageToDisplay, this.x, this.y);
   }
-} // The Enemy who goes to the Cowboy to kill him
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -321,7 +322,7 @@ let score = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function preload() {
+function preload() { //Loading in images, and sound
   //Loading Menu and Button Images
   wallImg = loadImage("assets/mapborder.png");
   midgrndImg = loadImage("assets/middleground.png");
@@ -348,53 +349,52 @@ function preload() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function setup() {
-  state = "MainMenu";
+  state = "MainMenu"; //Sets the state
   createCanvas(600, 600);
   background(0);
-  cowboyChar = new Cowboy(width / 2, height / 1.8, idleImg, upImg, downImg, leftImg, rightImg, bulletImg);
-  enemyChar = new Enemy(width / 2, height / 1.8, enemyImg);
-  cellSize = 24;
-  enemyChar.spawnin();
-  playSounds();
+  cowboyChar = new Cowboy(width / 2, height / 1.8, idleImg, upImg, downImg, leftImg, rightImg, bulletImg); //Calls the classes to exist as a variable
+  enemyChar = new Enemy(width / 2, height / 1.8, enemyImg); //Calls the classes to exist as a variable
+  cellSize = 24; //Grid cellSize
+  enemyChar.spawnin(); //Sets the location the enemy should start in
+  playSounds(); //Loads the said function
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function draw() {
-  mainMenu();
-  mainMenuButtons();
-  // Mouse to Rectangle collision detection
-  hoverPlay = collidePointRect(mouseX, mouseY, 200, 400, 600/2 - 100, 400/6);
-  hoverControls = collidePointRect(mouseX, mouseY, 200, 500, 600/2 - 100, 200/4);
-  hoverBackControl = collidePointRect(mouseX, mouseY, 20, 450, 75, 50);
+  mainMenu(); //Loads the said function
+  mainMenuButtons(); //Loads the said function
+  hoverPlay = collidePointRect(mouseX, mouseY, 200, 400, 600/2 - 100, 400/6); // Mouse to Rectangle collision detection
+  hoverControls = collidePointRect(mouseX, mouseY, 200, 500, 600/2 - 100, 200/4); // Mouse to Rectangle collision detection
+  hoverBackControl = collidePointRect(mouseX, mouseY, 20, 450, 75, 50); // Mouse to Rectangle collision detection
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function mainMenu(){
+function mainMenu(){ //State checking, map loading, score and health system loading, and Class loading
   if(state === "gameStart"){
     createCanvas(700,600);
     background(0);
     imageMode(CORNER);
-    drawMap();
-    textSize(20);
-    textAlign(CENTER, [CENTER]);
+    drawMap(); //Displays the made grid as the map
+    textSize(20); //Text size
+    textAlign(CENTER, [CENTER]); //Coords of text changed to CENTER
     fill(255);
-    text("Health:" + health, 650, 30);
-    text("Score:" + score, 650, 60);
-    cowboyChar.update();
-    cowboyChar.display();
+    text("Health:" + health, 650, 30); //Health system shown on right
+    text("Score:" + score, 650, 60); //Score system shown on right
+    cowboyChar.update(); //Updates coordinates of Class
+    cowboyChar.display(); //Shows Class based on the coords from the update above
 
-    for (let i = 0; i < enemyArray.length; i++) {
-      enemyChar.update();
-      enemyChar.display();
+    for (let i = 0; i < enemyArray.length; i++) { //Array which loads in the enemy
+      enemyChar.update(); //updates coordinates of Class
+      enemyChar.display();//Shows Class based on the coords from the update above
     }
-    checkCharEnemHitCoords();
+    checkCharEnemHitCoords(); //Checks for collison of Enemy and Cowboy
   }
-  else if (state === "controlSettings") {
+  else if (state === "controlSettings") { //Sets image for this state
     image(controlScreen, 0, 0, 600, 600);
   }
-  else if(state === "gameOver"){
+  else if(state === "gameOver"){ //Sets image for this state
     createCanvas(600,600);
     background(0);
     textSize(20);
@@ -403,14 +403,14 @@ function mainMenu(){
     text("you thought you had lives? Nope. Refresh page to start again",300,300);
   }
   else{
-    state = "MainMenu";
+    state = "MainMenu"; //If it can't do anything it stays at menu (this shouldn't happen)
     image(mainMenuScreen, 0, 0, 600, 600);
   }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function mainMenuButtons() {
+function mainMenuButtons() { // Determines size of the buttons on Menu. Checks for collision, and loads outside functions that change colors
   if (state === "MainMenu") {
     push(); // Creating rectangles that are linked to 2d Collide functions
     let fillStart = controlStart();
@@ -439,34 +439,36 @@ function mainMenuButtons() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function controlStart() {
-  if (state === "MainMenu"){
-    if(hoverPlay){ // This means if mouse x and y are in the certian cordinates then it will return triggering the if staement
-      fillStart = color(255);
-    }
-    else{
-      fillStart = color(255, 100, 100);
-    }
-    return fillStart;
-  }
-}
-
-function playSounds(){
+function playSounds(){ //Plays sound when its loaded
   if(state === "MainMenu"){
-    menuSound.play();
+    menuSound.play(); //Plays the sound for both menu and gameStart
   }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function backFill() {
-  let fillBack;
-  if (state === "controlSettings"){
-    if(hoverBackControl){ // This means if mouse x and y are in the certian cordinates then it will return triggering the if staement
-      fillBack = color(255);
+function controlStart() { //Code for the buttons on the menu. Changes the color of the button when mouse collides with the rectangle
+  if (state === "MainMenu"){
+    if(hoverPlay){ //If mouse x and y are in the certian cordinates it'll change the color
+      fillStart = color(255); //Changes the color of the box when hovered above it
     }
     else{
-      fillBack = color(255, 100, 100);
+      fillStart = color(255, 100, 100); //Changes the color of the box when hovered above it
+    }
+    return fillStart;
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function backFill() { //Code for the buttons on the menu. Changes the color of the button when mouse collides with the rectangle
+  let fillBack;
+  if (state === "controlSettings"){
+    if(hoverBackControl){ //If mouse x and y are in the certian cordinates it'll change the color
+      fillBack = color(255); //Changes the color of the box when hovered above it
+    }
+    else{
+      fillBack = color(255, 100, 100); //Changes the color of the box when hovered above it
     }
     return fillBack;
   }
@@ -474,14 +476,14 @@ function backFill() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function controlFill() {
-  // let fillControl;
-  if (state === "MainMenu"){
-    if(hoverControls){ // This means if mouse x and y are in the certian cordinates then it will return triggering the if staement
-      fillControl = color(255);
+function controlFill() { //Code for the buttons on the menu. Changes the color of the button when mouse collides with the rectangle
+  let controlFill;
+  if (state === "MainMenu"){ //If mouse x and y are in the certian cordinates it'll change the color
+    if(hoverControls){
+      fillControl = color(255); //Changes the color of the box when hovered above it
     }
     else{
-      fillControl = color(255, 100, 100);
+      fillControl = color(255, 100, 100); //Changes the color of the box when hovered above it
     }
     return fillControl;
   }
@@ -489,21 +491,21 @@ function controlFill() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function mousePressed() {
+function mousePressed() { //Function that does the things below when mouse is pressed
   if (state === "MainMenu"){
-    if (hoverPlay) {
+    if (hoverPlay) { //When its over the play button and clicked it changes state
       state = "gameStart";
     }
   }
   if (hoverControls) {
-    state = "controlSettings";
+    state = "controlSettings"; //State change for the Controls button
   }
-  else if (state === "controlSettings") {
+  else if (state === "controlSettings") { //State change for the back button under Controls state
     if (hoverBackControl){
       state = "MainMenu";
     }
   }
-  else if (state === "gameStart"){
+  else if (state === "gameStart"){ //Spawns the first enemy when you press play
     let enemy1 = {
     };
     enemyArray.push(enemy1);
@@ -512,27 +514,27 @@ function mousePressed() {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function checkCharEnemHitCoords(){
+function checkCharEnemHitCoords(){ //Checks for the collision between the Cowboy and Enemy
   let charHit = false;
-  charHit = collideRectRect(cowboyChar.x, cowboyChar.y, cowboyChar.w, cowboyChar.h, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h);
+  charHit = collideRectRect(cowboyChar.x, cowboyChar.y, cowboyChar.w, cowboyChar.h, enemyChar.x, enemyChar.y, enemyChar.w, enemyChar.h); //2D Collide code for the Cowboy and Enemy hitboxes
 
-  if (charHit === true){
+  if (charHit === true){ //When they are colliding it lowers health on the screen
     health -= 1;
   }
-  if (health < 0){
+  if (health < 0){ // When your health hits 0 it displays a gameover screen
     state = "gameOver";
   }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function keyPressed() {
+function keyPressed() { //If the key is down it does the cowboy key down inside the Cowboy class
   cowboyChar.handleKeyPress();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function keyReleased() {
+function keyReleased() { //If the key is up it does the cowboy key release inside the Cowboy class
   cowboyChar.handleKeyRelease();
 }
 
@@ -541,16 +543,16 @@ function keyReleased() {
 function drawMap() {
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
-      if (map1[j][i] === 1) {
+      if (map1[j][i] === 1) { // If the grid has a 1, it displays the image meant for 1
         image(wallImg, i * cellSize, j * cellSize, cellSize, cellSize);
       }
-      else if (map1[j][i] === 2) {
+      else if (map1[j][i] === 2) {// If the grid has a 2, it displays the image meant for 2
         image(midgrndImg, i * cellSize, j * cellSize, cellSize, cellSize);
       }
-      else if (map1[j][i] === 3) {
+      else if (map1[j][i] === 3) {// If the grid has a 2, it displays the image meant for 2
         image(etrgrndImg, i * cellSize, j * cellSize, cellSize, cellSize);
       }
-      else if (map1[j][i] === 4) {
+      else if (map1[j][i] === 4) {// If the grid has a 2, it displays the image meant for 2
         image(otrgrndImg, i * cellSize, j * cellSize, cellSize, cellSize);
       }
     }
